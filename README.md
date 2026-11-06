@@ -7,7 +7,7 @@
 在 Surge 的「模块 → 安装新模块／从 URL 安装模块」中粘贴：
 
 ```text
-https://raw.githubusercontent.com/Imyukehan/surge-adblock/main/Domestic-Adblock.sgmodule
+https://raw.githubusercontent.com/lr085818/surge-adblock/main/Domestic-Adblock.sgmodule
 ```
 
 默认分类为「去广告」。已安装的模块也可通过右侧「… → 更改类别」自行归类。
@@ -23,7 +23,7 @@ Mac 和 iPhone 可以使用同一个安装地址。发布修改后，在各设�
 - B 站：开屏、首页、首页短视频流、视频页推荐列表、播放器推广提示和播放暂停广告。保留普通推荐、活动卡片、竖屏视频、直播、热搜、动态和弹幕。
 - 内容社区：微博、知乎、贴吧、小红书、酷安、LOFTER，以及 Pixiv 的广告处理。
 - 购物与生活：淘宝、京东、盒马、美团、拼多多、闲鱼、什么值得买、小米商城、大麦、淘票票、猫眼、贝壳、58 同城等部分广告接口。
-- 出行与工具：高德、滴滴、携程、12306、百度网盘、网易云音乐、夸克、米游社、脉脉等部分广告接口。
+- 出行与工具：高德、滴滴、携程、12306、百度网盘（开屏及活动弹窗）、网易云音乐、夸克、米游社、脉脉等部分广告接口。
 
 覆盖的是模块中列出的广告接口，不代表清除每个 App 的全部广告。App 接口变化或已缓存广告可能影响结果。
 
@@ -66,6 +66,8 @@ python3 tests/test_bili_splash.py
 开屏回归检查需要 `jq`，验证广告列表及保留 ID 被清空、正常字段和错误响应保持原样，以及规则不匹配首页推荐接口。视频页及暂停接口的二进制回归检查可运行 `node tests/test_bili_pause.cjs /path/to/response.bundle.js`；传入的文件必须与 `sources.json` 固定的 SHA256 相符。该检查也验证异步推荐中的广告卡被移除、普通卡片和未知元数据保留，以及 iOS 所需的 gRPC 成功状态。
 
 ## 更新记录
+
+- 2026.11.07.1：补百度网盘开屏：拦截 `/act/api/activityentry`，`/api/getconfig` 返回空配置以关闭 splashMode；其余规则不变。如遇百度网盘首页异常，先删 getconfig 这一条、只留 activityentry。
 
 - 2026.10.21.1：B站依赖升级到 Biliverse 0.7.5，保留自定义开屏 `list` / `keep_ids` 清空补丁，补接普通视频页、异步推荐、播放器提示及结束页广告过滤；其他 App 规则不变。
 

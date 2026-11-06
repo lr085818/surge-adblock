@@ -1,9 +1,10 @@
 #!name=国内常用网站与 App 去广告
 #!desc=适用于国内常用网站与 App 的 Surge 去广告模块。精简 Ultra 并整合 B站开屏、首页、视频页与暂停去广告，剔除改区、网站跳转、解锁等附加规则。
 #!category=去广告
-#!version=2026.10.21.1
-#!homepage=https://github.com/Imyukehan/surge-adblock
+#!version=2026.11.07.1
+#!homepage=https://github.com/lr085818/surge-adblock
 #!author=Imyukehan; upstream: Biliverse, yfamilys, ddgksf2013, app2smile, blackmatrix7, deezertidal
+# Fork: lr085818/surge-adblock — 在上游 2026.10.21.1 基础上补百度网盘开屏（getconfig splashMode / activityentry），其余规则不变。
 # B站处理基于 Biliverse ADBlock 0.7.5，保留开屏、首页、视频页与播放暂停广告过滤。
 # 基础规则精简自 https://yfamilys.com/module/adultra.sgmodule (2026-10-10)。
 # 脚本从原作者地址加载，来源与内容校验值见仓库 sources.json。
@@ -14,6 +15,8 @@
 ^https?://app\.58\.com/api/home/invite/popupAdv _ reject
 ^https?://pan\.baidu\.com/rest/\d\.\d/pcs/ad _ reject
 ^https?://issuecdn\.baidupcs\.com/issue/netdisk/guanggao _ reject
+# 百度网盘开屏：活动弹窗入口直接拦截（上游未覆盖）
+^https?://pan\.baidu\.com/act/api/activityentry _ reject
 ^https?://c\.tieba\.baidu\.com/c/f/forum/getAdInfo _ reject
 ^https?://app\.api\.ke\.com/config/config/bootpage _ reject
 ^https?://m\.ctrip\.com/restapi/[\w/]+tripAds _ reject
@@ -36,6 +39,9 @@
 ^https?:\/\/sdkapp\.uve\.weibo\.com\/interface\/sdk\/sdkconfig\.php _ reject
 
 [Map Local]
+
+# 百度网盘：启动配置返回空，关闭开屏 splashMode；如遇首页异常，先删这一条
+^https?://pan\.baidu\.com/api/getconfig data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 ^https?://amap-aos-info-nogw\.amap\.com/ws/aos/alimama/ data-type=text data="" status-code=200
 ^https?:\/\/apps\.api\.ke\.com\/config\/config\/(bootpage|getactivityconfig) data-type=text data="" status-code=200
 ^https?://res\.xiaojukeji\.com\/resapi\/activity\/mget data-type=text data="" status-code=200
