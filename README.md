@@ -67,6 +67,8 @@ python3 tests/test_bili_splash.py
 
 ## 更新记录
 
+- 2026.11.07.3：补 `h2tcbox.baidu.com` 域名拦截——用户实机“最近请求”里它是唯一未被拦下的百度域名（00:45:18 有一次完成的 POST），且在公开拦截列表里被列为可屏蔽的百度域名；是否为开屏广告来源未证实，先按候选处理。另：2026.11.07.2 的规则已在用户实机日志里证实生效（广点通 v2mi.gdt.qq.com、穿山甲 QUIC、mobads-logs、afd/als/toblog/mssdk 均被阻止，pcs/adv 与 statistics 被 URL 重写拦下），00:44 仍出现的轮胎视频开屏极可能是开屏素材已缓存在本机，须在百度网盘 App 内清缓存后重开验证。
+
 - 2026.11.07.2：百度网盘开屏第二轮补漏（2026.11.07.1 装后开屏仍在，原因已查清）：① `/api/getsyscfg` 与 getconfig 一样返回空配置——新版开屏配置由这两个接口共同下发，只拦一个不够；② 新增 [Rule] 按域名屏蔽开屏聚合广告 SDK（百度 MobAds、腾讯广点通、穿山甲、快手联盟及十余家 ADX），开屏位是多家平台竞价填充的，只拦百度自家接口会被其他平台填上；③ 补拦截任务/插件/推荐/买广告/会员广告/福利列表/统计上报等同批接口。规则参考真机验证的 misakayyds BaiduNetdisk-AdBlock 1.3.0。装后需在百度网盘 App 内清一次缓存，已下载的开屏素材可能还会再播一两次。
 
 - 2026.11.07.1：补百度网盘开屏：拦截 `/act/api/activityentry`，`/api/getconfig` 返回空配置以关闭 splashMode；其余规则不变。如遇百度网盘首页异常，先删 getconfig 这一条、只留 activityentry。

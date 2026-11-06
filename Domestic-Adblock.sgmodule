@@ -1,10 +1,10 @@
 #!name=国内常用网站与 App 去广告
 #!desc=适用于国内常用网站与 App 的 Surge 去广告模块。精简 Ultra 并整合 B站开屏、首页、视频页与暂停去广告，剔除改区、网站跳转、解锁等附加规则。
 #!category=去广告
-#!version=2026.11.07.2
+#!version=2026.11.07.3
 #!homepage=https://github.com/lr085818/surge-adblock
 #!author=Imyukehan; upstream: Biliverse, yfamilys, ddgksf2013, app2smile, blackmatrix7, deezertidal
-# Fork: lr085818/surge-adblock — 在上游 2026.10.21.1 基础上补百度网盘开屏：2026.11.07.1 补 getconfig / activityentry；2026.11.07.2 再补 getsyscfg 与开屏聚合广告 SDK 域名屏蔽，其余规则不变。
+# Fork: lr085818/surge-adblock — 在上游 2026.10.21.1 基础上补百度网盘开屏：2026.11.07.1 补 getconfig / activityentry；2026.11.07.2 再补 getsyscfg 与开屏聚合广告 SDK 域名屏蔽；2026.11.07.3 补 h2tcbox.baidu.com（用户实机日志里唯一未拦的百度域名，见公开拦截列表），其余规则不变。
 # B站处理基于 Biliverse ADBlock 0.7.5，保留开屏、首页、视频页与播放暂停广告过滤。
 # 基础规则精简自 https://yfamilys.com/module/adultra.sgmodule (2026-10-10)。
 # 脚本从原作者地址加载，来源与内容校验值见仓库 sources.json。
@@ -24,6 +24,7 @@ DOMAIN,als.baidu.com,REJECT
 DOMAIN,wn.pos.baidu.com,REJECT
 DOMAIN,bgg.baidu.com,REJECT
 DOMAIN,cpro.baidustatic.com,REJECT
+DOMAIN,h2tcbox.baidu.com,REJECT
 # 腾讯广点通 GDT（优量汇）
 DOMAIN-SUFFIX,e.qq.com,REJECT
 DOMAIN-SUFFIX,gdt.qq.com,REJECT
