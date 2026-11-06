@@ -1,15 +1,64 @@
 #!name=国内常用网站与 App 去广告
 #!desc=适用于国内常用网站与 App 的 Surge 去广告模块。精简 Ultra 并整合 B站开屏、首页、视频页与暂停去广告，剔除改区、网站跳转、解锁等附加规则。
 #!category=去广告
-#!version=2026.11.07.1
+#!version=2026.11.07.2
 #!homepage=https://github.com/lr085818/surge-adblock
 #!author=Imyukehan; upstream: Biliverse, yfamilys, ddgksf2013, app2smile, blackmatrix7, deezertidal
-# Fork: lr085818/surge-adblock — 在上游 2026.10.21.1 基础上补百度网盘开屏（getconfig splashMode / activityentry），其余规则不变。
+# Fork: lr085818/surge-adblock — 在上游 2026.10.21.1 基础上补百度网盘开屏：2026.11.07.1 补 getconfig / activityentry；2026.11.07.2 再补 getsyscfg 与开屏聚合广告 SDK 域名屏蔽，其余规则不变。
 # B站处理基于 Biliverse ADBlock 0.7.5，保留开屏、首页、视频页与播放暂停广告过滤。
 # 基础规则精简自 https://yfamilys.com/module/adultra.sgmodule (2026-10-10)。
 # 脚本从原作者地址加载，来源与内容校验值见仓库 sources.json。
 # 不处理起点奖励广告；不包含通用广告联盟域名封锁。
 # Mac 使用 Maipo 时，可单独排除 api.weibo.com 的 MITM。
+
+[Rule]
+
+# 百度网盘开屏聚合广告 SDK：开屏位由多家广告平台竞价填充，只拦百度自家接口不够，需按域名屏蔽这些 SDK（真机日志确认，参考 misakayyds/shadowrocket-modules BaiduNetdisk-AdBlock 1.3.0）
+# 百度联盟 MobAds
+DOMAIN,mobads.baidu.com,REJECT
+DOMAIN,mobads-logs.baidu.com,REJECT
+DOMAIN,mobads-pre-config.cdn.bcebos.com,REJECT
+DOMAIN,afd.baidu.com,REJECT
+DOMAIN,afdconf.baidu.com,REJECT
+DOMAIN,als.baidu.com,REJECT
+DOMAIN,wn.pos.baidu.com,REJECT
+DOMAIN,bgg.baidu.com,REJECT
+DOMAIN,cpro.baidustatic.com,REJECT
+# 腾讯广点通 GDT（优量汇）
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,gdtimg.com,REJECT
+DOMAIN-SUFFIX,ugdtimg.com,REJECT
+# 穿山甲 Pangle（字节跳动广告 SDK）
+DOMAIN-SUFFIX,pangolin-sdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,pangolin-sdk-toutiao1.com,REJECT
+DOMAIN-SUFFIX,pangolin-sdk-toutiao-b.com,REJECT
+DOMAIN-SUFFIX,pglstatp-toutiao.com,REJECT
+DOMAIN-SUFFIX,ctobsnssdk.com,REJECT
+DOMAIN,mon.zijieapi.com,REJECT
+DOMAIN,mssdk-bu.bytedance.com,REJECT
+DOMAIN,mssdk.volces.com,REJECT
+DOMAIN,toblog.ctobsnssdk.com,REJECT
+DOMAIN,lf-cdn-tos.bytescm.com,REJECT
+# 快手联盟
+DOMAIN-SUFFIX,adukwai.com,REJECT
+# 聚合广告平台（百度网盘开屏/视频广告竞价请求）
+DOMAIN-SUFFIX,advlion.com,REJECT
+DOMAIN-SUFFIX,vlion.cn,REJECT
+DOMAIN-SUFFIX,beizi.biz,REJECT
+DOMAIN-SUFFIX,1rtb.net,REJECT
+DOMAIN-SUFFIX,zhangyuyidong.cn,REJECT
+DOMAIN-SUFFIX,yunxish.com,REJECT
+DOMAIN-SUFFIX,iggrowth.cn,REJECT
+DOMAIN-SUFFIX,ubixioe.com,REJECT
+DOMAIN-SUFFIX,hubcloud.com.cn,REJECT
+DOMAIN-SUFFIX,mentamob.com,REJECT
+DOMAIN-SUFFIX,adn-plus.com.cn,REJECT
+DOMAIN-SUFFIX,66mobi.com,REJECT
+DOMAIN-SUFFIX,adwangmai.com,REJECT
+DOMAIN-SUFFIX,halomobi.com,REJECT
+DOMAIN-SUFFIX,massx.com,REJECT
+
 [URL Rewrite]
 ^https?://app\.58\.com/api/home/(advertising|appadv)/ _ reject
 ^https?://app\.58\.com/api/home/invite/popupAdv _ reject
@@ -17,6 +66,15 @@
 ^https?://issuecdn\.baidupcs\.com/issue/netdisk/guanggao _ reject
 # 百度网盘开屏：活动弹窗入口直接拦截（上游未覆盖）
 ^https?://pan\.baidu\.com/act/api/activityentry _ reject
+# 百度网盘广告配置与弹窗接口（与开屏同一批下发；参考 misakayyds BaiduNetdisk-AdBlock 1.3.0；pcs/adv 已被上面 pcs/ad 前缀覆盖，不重复写）
+^https?://pan\.baidu\.com/api/taskscore/tasklist _ reject
+^https?://pan\.baidu\.com/api/plugin/get _ reject
+^https?://pan\.baidu\.com/recommend/query/list _ reject
+^https?://pan\.baidu\.com/buy/ad/(conf|get) _ reject
+^https?://pan\.baidu\.com/rest/2\.0/membership/advertise _ reject
+^https?://pan\.baidu\.com/act/v\d/(bchannel|welfare)/list _ reject
+^https?://update\.pan\.baidu\.com/statistics _ reject
+^https?://ndstatic\.cdn\.bcebos\.com/activity/welfare/ _ reject
 ^https?://c\.tieba\.baidu\.com/c/f/forum/getAdInfo _ reject
 ^https?://app\.api\.ke\.com/config/config/bootpage _ reject
 ^https?://m\.ctrip\.com/restapi/[\w/]+tripAds _ reject
@@ -40,8 +98,9 @@
 
 [Map Local]
 
-# 百度网盘：启动配置返回空，关闭开屏 splashMode；如遇首页异常，先删这一条
+# 百度网盘：启动配置返回空，关闭开屏 splashMode；如遇首页异常，先删这两条
 ^https?://pan\.baidu\.com/api/getconfig data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+^https?://pan\.baidu\.com/api/getsyscfg data-type=text data="{}" status-code=200 header="Content-Type:application/json"
 ^https?://amap-aos-info-nogw\.amap\.com/ws/aos/alimama/ data-type=text data="" status-code=200
 ^https?:\/\/apps\.api\.ke\.com\/config\/config\/(bootpage|getactivityconfig) data-type=text data="" status-code=200
 ^https?://res\.xiaojukeji\.com\/resapi\/activity\/mget data-type=text data="" status-code=200
@@ -179,4 +238,4 @@ Adblock.Bili.view.response.grpc = type=http-response, pattern=^https?:\/\/(grpc|
 [MITM]
 # gRPC 视频页接口使用 HTTP/2。
 h2 = true
-hostname = %APPEND% grpc.biliapi.net, grpc.bilibili.com, app.58.com, pan.baidu.com, issuecdn.baidupcs.com, c.tieba.baidu.com, tiebac.baidu.com, app.api.ke.com, apps.api.ke.com, m.ctrip.com, ma-adx.ctrip.com, api.m.jd.com, bdsp-x.jd.com, dsp-x.jd.com, api.m.mi.com, shop-api.retail.mi.com, wmapi.meituan.com, *.meituan.com, flowplus.meituan.net, img.meituan.net, p*.meituan.net, api.pinduoduo.com, api.yangkeduo.com, api.smzdm.com, app-api.smzdm.com, *.zdmimg.com, homepage-api.smzdm.com, haojia-api.smzdm.com, haojia.m.smzdm.com, baike-api.smzdm.com, s-api.smzdm.com, zhiyou.m.smzdm.com, mbasecc.bas.cmbchina.com, api.zhihu.com, www.zhihu.com, page-info.zhihu.com, web-render.zhihu.com, p0.pipi.cn, m.mynj.cn, api.weibo.cn, mapi.weibo.cn, api.weibo.com, mapi.weibo.com, boot*.weibo.com, boot.biz.weibo.com, *.uve.weibo.com, amap-aos-info-nogw.amap.com, m*.amap.com, *.xiaohongshu.com, res.xiaojukeji.com, adv.ccb.com, ad.lofter.com, open.taou.com, api.taou.com, bbs-api.miyoushe.com, ad.12306.cn, api.coolapk.com, open-cms-api.uc.cn, open-cms-api.quark.cn, interface*.music.163.com, oauth.secure.pixiv.net, app.bilibili.com, app.biliapi.net, acs.m.taobao.com, cn-acs.m.cainiao.com, gw.alicdn.com, heic.alicdn.com, gw.kaola.com, acs.m.goofish.com, g-acs.m.goofish.com, acs-m.freshippo.com, guide-acs.m.taobao.com, sdk.alibaba.com.ailbaba.me, zconfig.alibabausercontent.com, sp.kaola.com, *.cainiao.com, acs4miniapp-inner.m.taobao.com
+hostname = %APPEND% grpc.biliapi.net, grpc.bilibili.com, app.58.com, pan.baidu.com, issuecdn.baidupcs.com, ndstatic.cdn.bcebos.com, update.pan.baidu.com, c.tieba.baidu.com, tiebac.baidu.com, app.api.ke.com, apps.api.ke.com, m.ctrip.com, ma-adx.ctrip.com, api.m.jd.com, bdsp-x.jd.com, dsp-x.jd.com, api.m.mi.com, shop-api.retail.mi.com, wmapi.meituan.com, *.meituan.com, flowplus.meituan.net, img.meituan.net, p*.meituan.net, api.pinduoduo.com, api.yangkeduo.com, api.smzdm.com, app-api.smzdm.com, *.zdmimg.com, homepage-api.smzdm.com, haojia-api.smzdm.com, haojia.m.smzdm.com, baike-api.smzdm.com, s-api.smzdm.com, zhiyou.m.smzdm.com, mbasecc.bas.cmbchina.com, api.zhihu.com, www.zhihu.com, page-info.zhihu.com, web-render.zhihu.com, p0.pipi.cn, m.mynj.cn, api.weibo.cn, mapi.weibo.cn, api.weibo.com, mapi.weibo.com, boot*.weibo.com, boot.biz.weibo.com, *.uve.weibo.com, amap-aos-info-nogw.amap.com, m*.amap.com, *.xiaohongshu.com, res.xiaojukeji.com, adv.ccb.com, ad.lofter.com, open.taou.com, api.taou.com, bbs-api.miyoushe.com, ad.12306.cn, api.coolapk.com, open-cms-api.uc.cn, open-cms-api.quark.cn, interface*.music.163.com, oauth.secure.pixiv.net, app.bilibili.com, app.biliapi.net, acs.m.taobao.com, cn-acs.m.cainiao.com, gw.alicdn.com, heic.alicdn.com, gw.kaola.com, acs.m.goofish.com, g-acs.m.goofish.com, acs-m.freshippo.com, guide-acs.m.taobao.com, sdk.alibaba.com.ailbaba.me, zconfig.alibabausercontent.com, sp.kaola.com, *.cainiao.com, acs4miniapp-inner.m.taobao.com
